@@ -10,6 +10,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Settings = lazy(() => import('./pages/Settings'));
 const ProjectBoard = lazy(() => import('./pages/ProjectBoard'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 
@@ -38,6 +39,7 @@ export default function App() {
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/projects/:id" element={<ProjectBoard />} />
             </Route>
 

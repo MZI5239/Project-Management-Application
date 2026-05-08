@@ -38,8 +38,20 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const updateProfile = async (updates) => {
+        const res = await api.put('/auth/me', updates);
+        setUser(res.data.user);
+        return res.data;
+    };
+
+    const changePassword = async (currentPassword, newPassword) => {
+        const res = await api.put('/auth/change-password', { currentPassword, newPassword });
+        setUser(res.data.user);
+        return res.data;
+    };
+
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, changePassword }}>
             {children}
         </AuthContext.Provider>
     );

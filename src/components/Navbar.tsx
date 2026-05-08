@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Shield, LogOut, Code2, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Shield, LogOut, Code2, Menu, X, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'motion/react';
@@ -24,6 +24,7 @@ const Navbar = () => {
 
     const navLinks = [
         { to: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-gray-600', hover: 'hover:text-indigo-600' },
+        { to: '/settings', label: 'Settings', icon: Settings, color: 'text-gray-600', hover: 'hover:text-indigo-600' },
         ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel', icon: Shield, color: 'text-purple-600', hover: 'hover:text-purple-700', bg: 'bg-purple-50' }] : [])
     ];
 
