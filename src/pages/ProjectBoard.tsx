@@ -48,9 +48,9 @@ interface Comment {
 }
 
 const COLUMNS = [
-    { id: 'todo', title: 'To Do', icon: <CircleDashed className="w-4 h-4" />, color: 'bg-gray-100' },
-    { id: 'inprogress', title: 'In Progress', icon: <Clock className="w-4 h-4" />, color: 'bg-blue-50' },
-    { id: 'done', title: 'Done', icon: <CheckCircle2 className="w-4 h-4" />, color: 'bg-green-50' }
+    { id: 'todo', title: 'To Do', icon: <CircleDashed className="w-4 h-4" />, color: 'bg-white/10 text-slate-200' },
+    { id: 'inprogress', title: 'In Progress', icon: <Clock className="w-4 h-4" />, color: 'bg-cyan-400/20 text-cyan-100' },
+    { id: 'done', title: 'Done', icon: <CheckCircle2 className="w-4 h-4" />, color: 'bg-emerald-400/20 text-emerald-100' }
 ];
 
 const ProjectBoard = () => {
@@ -394,27 +394,37 @@ const ProjectBoard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+            <div className="relative min-h-screen overflow-hidden bg-[#06111f] text-white">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.3),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(14,165,233,0.24),_transparent_30%),linear-gradient(135deg,_#06111f_0%,_#0d1728_45%,_#101b33_100%)]" />
+                <div className="relative flex min-h-screen items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-cyan-300 animate-spin" />
+                </div>
             </div>
         );
     }
 
     if (!project) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
-                <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-                <h1 className="text-2xl font-bold text-gray-900">Project Not Found</h1>
-                <Link to="/" className="mt-4 text-indigo-600 hover:underline">Return to Dashboard</Link>
+            <div className="relative min-h-screen overflow-hidden bg-[#06111f] text-white">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.3),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(14,165,233,0.24),_transparent_30%),linear-gradient(135deg,_#06111f_0%,_#0d1728_45%,_#101b33_100%)]" />
+                <div className="relative min-h-screen flex flex-col items-center justify-center text-center px-4">
+                    <AlertCircle className="w-12 h-12 text-rose-300 mb-4" />
+                    <h1 className="text-2xl font-bold text-white">Project Not Found</h1>
+                    <Link to="/" className="mt-4 text-cyan-200 hover:text-cyan-100 underline underline-offset-4">Return to Dashboard</Link>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50/30">
+        <div className="relative min-h-screen overflow-hidden bg-[#06111f] text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.3),_transparent_34%),radial-gradient(circle_at_top_right,_rgba(14,165,233,0.24),_transparent_30%),linear-gradient(135deg,_#06111f_0%,_#0d1728_45%,_#101b33_100%)]" />
+            <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:42px_42px]" />
+
+            <div className="relative flex min-h-screen flex-col">
             <Navbar />
 
-            <header className="bg-white border-b border-gray-200 py-6">
+            <header className="border-b border-white/10 bg-white/6 backdrop-blur-xl py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div 
                         initial={{ opacity: 0, y: -10 }}
@@ -422,17 +432,17 @@ const ProjectBoard = () => {
                         className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0"
                     >
                         <div className="flex items-center space-x-4">
-                            <Link to="/" className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                <ArrowLeft className="w-5 h-5 text-gray-400" />
+                            <Link to="/" className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                                <ArrowLeft className="w-5 h-5 text-slate-300" />
                             </Link>
                             <div>
                                 <div className="flex items-center space-x-2">
-                                    <h1 className="text-2xl font-bold text-gray-900">{project.title}</h1>
-                                    <span className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase rounded-md tracking-wider">
+                                    <h1 className="text-2xl font-black text-white">{project.title}</h1>
+                                    <span className="px-2 py-0.5 bg-cyan-400/15 text-cyan-100 text-[10px] font-bold uppercase rounded-md tracking-wider border border-cyan-300/20">
                                         Board
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-500 mt-0.5">{project.description || 'Project visualization board'}</p>
+                                <p className="text-sm text-slate-300 mt-0.5">{project.description || 'Project visualization board'}</p>
                             </div>
                         </div>
 
@@ -440,31 +450,31 @@ const ProjectBoard = () => {
                             <div className="flex -space-x-2">
                                 {/* Owner badge */}
                                 <div className="relative group">
-                                    <div className="w-8 h-8 rounded-full border-2 border-indigo-600 bg-gray-100 flex items-center justify-center overflow-hidden z-20" title={`Leader: ${project.owner?.name}`}>
+                                    <div className="w-8 h-8 rounded-full border-2 border-cyan-500 bg-slate-800/70 flex items-center justify-center overflow-hidden z-20" title={`Leader: ${project.owner?.name}`}>
                                         {project.owner?.avatar ? (
                                             <img src={project.owner?.avatar} alt={project.owner?.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-[10px] font-bold text-indigo-600">{project.owner?.name[0]}</span>
+                                            <span className="text-[10px] font-bold text-cyan-200">{project.owner?.name[0]}</span>
                                         )}
                                     </div>
-                                    <Shield className="absolute -top-1 -right-1 w-3.5 h-3.5 text-indigo-600 fill-indigo-600 z-30" />
+                                    <Shield className="absolute -top-1 -right-1 w-3.5 h-3.5 text-cyan-300 fill-cyan-300 z-30" />
                                 </div>
 
                                 {project.members?.map((member: any) => (
-                                    <div key={member._id} className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center overflow-hidden" title={member.name}>
+                                    <div key={member._id} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-700/70 flex items-center justify-center overflow-hidden" title={member.name}>
                                         {member.avatar ? (
                                             <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-[10px] font-bold text-gray-600">{member.name[0]}</span>
+                                            <span className="text-[10px] font-bold text-slate-200">{member.name[0]}</span>
                                         )}
                                     </div>
                                 ))}
                             </div>
-                            <div className="h-6 w-px bg-gray-200 mx-1" />
+                            <div className="h-6 w-px bg-white/20 mx-1" />
                             {isLeader && (
                                 <button 
                                     onClick={() => setShowInviteModal(true)}
-                                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                                    className="p-2 text-slate-300 hover:text-cyan-200 hover:bg-cyan-400/10 rounded-full transition-colors"
                                     title="Invite Members"
                                 >
                                     <Plus className="w-5 h-5" />
@@ -473,13 +483,13 @@ const ProjectBoard = () => {
                             {isLeader && (
                                 <button 
                                     onClick={() => setShowLeadershipModal(true)}
-                                    className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-full transition-colors"
+                                    className="p-2 text-slate-300 hover:text-amber-200 hover:bg-amber-400/10 rounded-full transition-colors"
                                     title="Manage Leadership"
                                 >
                                     <Shield className="w-5 h-5" />
                                 </button>
                             )}
-                            <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                            <button className="p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-colors">
                                 <MoreVertical className="w-5 h-5" />
                             </button>
                         </div>
@@ -497,23 +507,23 @@ const ProjectBoard = () => {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <div className="grid grid-cols-3 gap-6 h-full">
                             {COLUMNS.map(column => (
-                                <div key={column.id} className="flex flex-col h-full bg-gray-100/50 rounded-2xl border border-gray-200 p-4">
+                                <div key={column.id} className="flex flex-col h-full bg-white/6 rounded-2xl border border-white/10 p-4 backdrop-blur-xl">
                                     <div className="flex items-center justify-between mb-4 px-2">
                                         <div className="flex items-center space-x-2">
                                             <div className={`p-1.5 rounded-md ${column.color}`}>
-                                                {React.cloneElement(column.icon as React.ReactElement, { className: 'w-4 h-4 text-gray-700' })}
+                                                {React.cloneElement(column.icon as React.ReactElement, { className: 'w-4 h-4' })}
                                             </div>
-                                            <h2 className="font-bold text-gray-900">{column.title}</h2>
-                                            <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-gray-400 border border-gray-200">
+                                            <h2 className="font-bold text-white">{column.title}</h2>
+                                            <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs font-bold text-slate-300 border border-white/15">
                                                 {tasks.filter(t => t.status === column.id).length}
                                             </span>
                                         </div>
                                         {isLeader && (
                                             <button 
                                                 onClick={() => setShowAddTask(column.id)}
-                                                className="p-1 hover:bg-white rounded transition-colors"
+                                                className="p-1 hover:bg-white/10 rounded transition-colors"
                                             >
-                                                <Plus className="w-4 h-4 text-gray-500" />
+                                                <Plus className="w-4 h-4 text-slate-300" />
                                             </button>
                                         )}
                                     </div>
@@ -555,10 +565,10 @@ const ProjectBoard = () => {
                                                                     onClick={() => handleEditTask(task)}
                                                                     onMouseEnter={() => setHoveredTaskId(task._id)}
                                                                     onMouseLeave={() => setHoveredTaskId(null)}
-                                                                    className={`bg-white p-4 rounded-xl shadow-sm border group hover:border-indigo-200 transition-all cursor-pointer ${
-                                                                        snapshot.isDragging ? 'shadow-xl rotate-1 border-indigo-300' : 
-                                                                        isActivePrerequisite ? 'border-indigo-500 ring-2 ring-indigo-200 shadow-md transform scale-[1.02]' :
-                                                                        'border-gray-200'
+                                                                    className={`bg-white/92 p-4 rounded-xl shadow-[0_14px_36px_rgba(2,6,23,0.28)] border group hover:border-cyan-300/60 transition-all cursor-pointer ${
+                                                                        snapshot.isDragging ? 'shadow-xl rotate-1 border-cyan-400' : 
+                                                                        isActivePrerequisite ? 'border-cyan-500 ring-2 ring-cyan-300/30 shadow-md transform scale-[1.02]' :
+                                                                        'border-slate-200'
                                                                     }`}
                                                                 >
                                                                     <div className="flex justify-between items-start mb-3">
@@ -583,7 +593,7 @@ const ProjectBoard = () => {
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    <h3 className="font-semibold text-gray-900 mb-1 leading-snug group-hover:text-indigo-600 transition-colors">
+                                                                    <h3 className="font-semibold text-slate-900 mb-1 leading-snug group-hover:text-cyan-700 transition-colors">
                                                                         {task.title}
                                                                     </h3>
 
@@ -656,7 +666,7 @@ const ProjectBoard = () => {
                                                                                     setExpandedComments(prev => ({ ...prev, [task._id]: isOpen }));
                                                                                     if (isOpen) fetchComments(task._id);
                                                                                 }}
-                                                                                className="flex items-center space-x-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                                                className="flex items-center space-x-1 text-slate-400 hover:text-cyan-700 transition-colors"
                                                                             >
                                                                                 <MessageSquare className="w-3.5 h-3.5" />
                                                                                 <span className="text-[10px] font-bold">
@@ -686,10 +696,10 @@ const ProjectBoard = () => {
                                                                                 onClick={(e) => e.stopPropagation()}
                                                                                 className="overflow-hidden"
                                                                             >
-                                                                                <div className="mt-4 pt-2 border-t border-gray-100 space-y-2">
+                                                                                <div className="mt-4 pt-2 border-t border-slate-100 space-y-2">
                                                                                     <div className="max-h-32 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                                                                                         {commentsByTask[task._id]?.map(comment => (
-                                                                                            <div key={comment._id} className="bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                                                                            <div key={comment._id} className="bg-slate-50 p-2 rounded-lg border border-slate-100">
                                                                                                 <div className="flex items-center justify-between mb-1">
                                                                                                     <span className="text-[8px] font-black text-gray-700 uppercase">
                                                                                                         {comment.author?.name}
@@ -711,7 +721,7 @@ const ProjectBoard = () => {
                                                                                             value={commentInputs[task._id] || ''}
                                                                                             onChange={(e) => setCommentInputs(prev => ({ ...prev, [task._id]: e.target.value }))}
                                                                                             placeholder="Comment..."
-                                                                                            className="flex-1 text-[10px] bg-gray-50 border border-gray-100 rounded-lg px-2 py-1 outline-none focus:border-indigo-200"
+                                                                                            className="flex-1 text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-cyan-300"
                                                                                             onKeyDown={(e) => {
                                                                                                 if (e.key === 'Enter') {
                                                                                                     e.preventDefault();
@@ -721,7 +731,7 @@ const ProjectBoard = () => {
                                                                                         />
                                                                                         <button 
                                                                                             onClick={() => handleAddComment(task._id)}
-                                                                                            className="p-1 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-colors"
+                                                                                            className="p-1 bg-cyan-50 text-cyan-700 rounded-lg hover:bg-cyan-600 hover:text-white transition-colors"
                                                                                         >
                                                                                             <Send className="w-3 h-3" />
                                                                                         </button>
@@ -738,28 +748,28 @@ const ProjectBoard = () => {
                                                 {provided.placeholder}
                                                 
                                                 {showAddTask === column.id && (
-                                                    <div className="bg-white p-3 rounded-xl border-2 border-indigo-200 shadow-lg animate-in fade-in zoom-in duration-200">
+                                                    <div className="bg-white/95 p-3 rounded-xl border-2 border-cyan-300/40 shadow-lg animate-in fade-in zoom-in duration-200">
                                                         <input
                                                             autoFocus
                                                             type="text"
                                                             value={newTaskTitle}
                                                             onChange={(e) => setNewTaskTitle(e.target.value)}
-                                                            className="w-full text-sm outline-none mb-3 font-medium"
+                                                            className="w-full text-sm outline-none mb-3 font-medium text-slate-800"
                                                             placeholder="What needs to be done?"
                                                             onKeyDown={(e) => e.key === 'Enter' && handleAddTask(column.id)}
                                                         />
                                                         <div className="flex items-center space-x-2 mb-3">
-                                                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                                                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
                                                             <input 
                                                                 type="date"
                                                                 value={newTaskDueDate}
                                                                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                                                                className="text-[10px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 outline-none flex-1"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1"
                                                             />
                                                             <select
                                                                 value={newTaskPriority}
                                                                 onChange={(e) => setNewTaskPriority(e.target.value as any)}
-                                                                className="text-[10px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 outline-none w-20"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none w-20"
                                                             >
                                                                 <option value="low">Low</option>
                                                                 <option value="medium">Med</option>
@@ -769,7 +779,7 @@ const ProjectBoard = () => {
                                                                 multiple
                                                                 value={newTaskAssignees}
                                                                 onChange={(e) => setNewTaskAssignees(Array.from(e.target.selectedOptions).map((o: any) => o.value))}
-                                                                className="text-[10px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 outline-none flex-1 h-16"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1 h-16"
                                                             >
                                                                 {participants.map((member: any) => (
                                                                     <option key={member._id} value={member._id}>{member.name}</option>
@@ -777,21 +787,21 @@ const ProjectBoard = () => {
                                                             </select>
                                                         </div>
                                                         <div className="flex flex-col space-y-1 mb-3">
-                                                            <label className="text-[10px] font-bold text-gray-400 uppercase">Prerequisites</label>
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase">Prerequisites</label>
                                                             <select
                                                                 multiple
                                                                 value={newTaskDependencies}
                                                                 onChange={(e) => setNewTaskDependencies(Array.from(e.target.selectedOptions).map((o: any) => o.value))}
-                                                                className="w-full text-[10px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 outline-none h-16"
+                                                                className="w-full text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none h-16"
                                                             >
                                                                 {tasks.map(t => (
                                                                     <option key={t._id} value={t._id}>{t.title}</option>
                                                                 ))}
                                                             </select>
-                                                            <p className="text-[8px] text-gray-400 italic">Ctrl+Click to select</p>
+                                                            <p className="text-[8px] text-slate-400 italic">Ctrl+Click to select</p>
                                                         </div>
                                                         <div className="flex flex-col space-y-1 mb-3">
-                                                            <label className="text-[10px] font-bold text-gray-400 uppercase">Labels</label>
+                                                            <label className="text-[10px] font-bold text-slate-400 uppercase">Labels</label>
                                                             <div className="flex flex-wrap gap-1 mb-1">
                                                                 {newTaskLabels.map((label, i) => (
                                                                     <span 
@@ -817,7 +827,7 @@ const ProjectBoard = () => {
                                                                     }
                                                                 }}
                                                                 placeholder="Add label & press Enter"
-                                                                className="text-[10px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 outline-none"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none"
                                                             />
                                                         </div>
                                                         <div className="flex justify-end space-x-2">
@@ -832,13 +842,13 @@ const ProjectBoard = () => {
                                                                     setNewTaskLabels([]);
                                                                     setLabelInput('');
                                                                 }}
-                                                                className="px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 rounded font-bold"
+                                                                className="px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 rounded font-bold"
                                                             >
                                                                 Cancel
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleAddTask(column.id)}
-                                                                className="px-2 py-1 text-xs bg-indigo-600 text-white rounded font-bold hover:bg-indigo-700"
+                                                                className="px-2 py-1 text-xs bg-cyan-600 text-white rounded font-bold hover:bg-cyan-700"
                                                             >
                                                                 Add Task
                                                             </button>
@@ -872,23 +882,23 @@ const ProjectBoard = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg border border-gray-100"
+                            className="relative w-full max-w-lg rounded-[2rem] border border-white/10 bg-white/94 p-8 text-slate-900 shadow-[0_30px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl"
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <span className={`text-[10px] uppercase font-black tracking-widest px-2 py-1 rounded bg-gray-50 mb-2 inline-block ${
+                                    <span className={`text-[10px] uppercase font-black tracking-widest px-2 py-1 rounded bg-slate-50 mb-2 inline-block ${
                                         editForm.priority === 'high' ? 'text-red-500' :
                                         editForm.priority === 'medium' ? 'text-yellow-600' : 'text-green-500'
                                     }`}>
                                         {editForm.priority} Priority
                                     </span>
-                                    <h2 className="text-2xl font-bold text-gray-900 leading-tight">Task Details</h2>
+                                    <h2 className="text-2xl font-bold text-slate-900 leading-tight">Task Details</h2>
                                 </div>
                                 <button 
                                     onClick={() => setEditingTask(null)}
-                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                                 >
-                                    <AlertCircle className="w-5 h-5 text-gray-400 rotate-45" />
+                                    <AlertCircle className="w-5 h-5 text-slate-400 rotate-45" />
                                 </button>
                             </div>
 
@@ -927,7 +937,7 @@ const ProjectBoard = () => {
                                                 disabled={!isLeader}
                                                 value={editForm.dueDate}
                                                 onChange={(e) => setEditForm(prev => ({ ...prev, dueDate: e.target.value }))}
-                                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm disabled:opacity-60"
+                                                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm disabled:opacity-60"
                                             />
                                         </div>
                                     </div>
@@ -937,7 +947,7 @@ const ProjectBoard = () => {
                                             disabled={!isLeader}
                                             value={editForm.priority}
                                             onChange={(e) => setEditForm(prev => ({ ...prev, priority: e.target.value as any }))}
-                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium disabled:opacity-60"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm font-medium disabled:opacity-60"
                                         >
                                             <option value="low">Low</option>
                                             <option value="medium">Medium</option>
@@ -953,7 +963,7 @@ const ProjectBoard = () => {
                                                 disabled={!isLeader}
                                                 value={editForm.assignees}
                                                 onChange={(e) => setEditForm(prev => ({ ...prev, assignees: Array.from(e.target.selectedOptions).map((o: any) => o.value) }))}
-                                                className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium disabled:opacity-60 h-24"
+                                                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm font-medium disabled:opacity-60 h-24"
                                             >
                                                 {participants.map((member: any) => (
                                                     <option key={member._id} value={member._id}>{member.name} ({member.email})</option>
@@ -971,7 +981,7 @@ const ProjectBoard = () => {
                                         disabled={!isLeader}
                                         value={editForm.dependencies}
                                         onChange={(e) => setEditForm(prev => ({ ...prev, dependencies: Array.from(e.target.selectedOptions).map((o: any) => o.value) }))}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium h-24 disabled:opacity-60"
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm font-medium h-24 disabled:opacity-60"
                                     >
                                         {tasks.filter(t => t._id !== editingTask?._id).map(t => (
                                             <option key={t._id} value={t._id}>{t.title}</option>
@@ -1011,7 +1021,7 @@ const ProjectBoard = () => {
                                                 }
                                             }}
                                             placeholder="Add label & press Enter"
-                                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-medium"
+                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm font-medium"
                                         />
                                     )}
                                 </div>
@@ -1030,7 +1040,7 @@ const ProjectBoard = () => {
                                     {isLeader ? (
                                         <button
                                             type="submit"
-                                            className="flex-[2] bg-indigo-600 text-white rounded-2xl py-4 font-bold hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.98]"
+                                            className="flex-[2] bg-gradient-to-r from-indigo-600 via-cyan-600 to-sky-500 text-white rounded-2xl py-4 font-bold shadow-xl shadow-cyan-200/40 transition-all active:scale-[0.98]"
                                         >
                                             Save Changes
                                         </button>
@@ -1038,14 +1048,14 @@ const ProjectBoard = () => {
                                         <button
                                             type="button"
                                             onClick={() => setEditingTask(null)}
-                                            className="flex-1 bg-gray-100 text-gray-600 rounded-2xl py-4 font-bold hover:bg-gray-200 transition-all"
+                                            className="flex-1 bg-slate-100 text-slate-600 rounded-2xl py-4 font-bold hover:bg-slate-200 transition-all"
                                         >
                                             Close
                                         </button>
                                     )}
                                 </div>
                                 {isLeader && (
-                                    <div className="pt-2 border-t border-gray-100">
+                                    <div className="pt-2 border-t border-slate-100">
                                         <button
                                             type="button"
                                             onClick={() => handleDeleteTask(editingTask._id)}
@@ -1058,7 +1068,7 @@ const ProjectBoard = () => {
                                 )}
 
                                 {/* Comments in Modal */}
-                                <div className="pt-6 border-t border-gray-100">
+                                <div className="pt-6 border-t border-slate-100">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-sm font-black uppercase tracking-widest text-gray-400 flex items-center">
                                             <MessageSquare className="w-4 h-4 mr-2" />
@@ -1066,7 +1076,7 @@ const ProjectBoard = () => {
                                         </h3>
                                     </div>
                                     
-                                    <div className="bg-gray-50 rounded-2xl p-4 mb-2">
+                                    <div className="bg-slate-50 rounded-2xl p-4 mb-2">
                                         <div className="space-y-4 max-h-[200px] overflow-y-auto mb-4 pr-1">
                                             {commentsByTask[editingTask._id]?.map(comment => (
                                                 <div key={comment._id} className="flex space-x-3">
@@ -1101,12 +1111,12 @@ const ProjectBoard = () => {
                                                     }
                                                 }}
                                                 placeholder="Write a comment..."
-                                                className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+                                                className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium"
                                             />
                                             <button 
                                                 type="button"
                                                 onClick={() => handleAddComment(editingTask._id)}
-                                                className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center shadow-lg shadow-indigo-100"
+                                                className="p-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center shadow-lg shadow-cyan-100"
                                             >
                                                 <Send className="w-4 h-4" />
                                             </button>
@@ -1134,18 +1144,18 @@ const ProjectBoard = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md border border-gray-100"
+                            className="relative w-full max-w-md rounded-[2rem] border border-white/10 bg-white/94 p-8 text-slate-900 shadow-[0_30px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl"
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 leading-tight">Add Member</h2>
-                                    <p className="text-gray-500 mt-1">Invite a teammate to this project.</p>
+                                    <h2 className="text-2xl font-bold text-slate-900 leading-tight">Add Member</h2>
+                                    <p className="text-slate-500 mt-1">Invite a teammate to this project.</p>
                                 </div>
                                 <button 
                                     onClick={() => setShowInviteModal(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                                 >
-                                    <AlertCircle className="w-5 h-5 text-gray-400 rotate-45" />
+                                    <AlertCircle className="w-5 h-5 text-slate-400 rotate-45" />
                                 </button>
                             </div>
 
@@ -1160,7 +1170,7 @@ const ProjectBoard = () => {
                                             value={inviteEmail}
                                             onChange={(e) => setInviteEmail(e.target.value)}
                                             placeholder="teammate@example.com"
-                                            className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                                            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -1168,7 +1178,7 @@ const ProjectBoard = () => {
                                 <button
                                     disabled={inviting}
                                     type="submit"
-                                    className="w-full bg-indigo-600 text-white rounded-2xl py-4 font-bold text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center space-x-2"
+                                    className="w-full bg-gradient-to-r from-indigo-600 via-cyan-600 to-sky-500 text-white rounded-2xl py-4 font-bold text-lg shadow-xl shadow-cyan-100/50 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center space-x-2"
                                 >
                                     {inviting ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Send Invitation</span>}
                                 </button>
@@ -1193,64 +1203,64 @@ const ProjectBoard = () => {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-lg border border-gray-100 max-h-[80vh] flex flex-col"
+                            className="relative w-full max-w-lg rounded-[2rem] border border-white/10 bg-white/94 p-8 text-slate-900 shadow-[0_30px_80px_rgba(2,6,23,0.45)] backdrop-blur-xl max-h-[80vh] flex flex-col"
                         >
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-900 leading-tight">Project Leadership</h2>
-                                    <p className="text-gray-500 mt-1">Manage project ownership and transfer leadership.</p>
+                                    <h2 className="text-2xl font-bold text-slate-900 leading-tight">Project Leadership</h2>
+                                    <p className="text-slate-500 mt-1">Manage project ownership and transfer leadership.</p>
                                 </div>
                                 <button 
                                     onClick={() => setShowLeadershipModal(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                                 >
-                                    <AlertCircle className="w-5 h-5 text-gray-400 rotate-45" />
+                                    <AlertCircle className="w-5 h-5 text-slate-400 rotate-45" />
                                 </button>
                             </div>
 
                             <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-                                <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between">
+                                <div className="p-4 bg-cyan-50 border border-cyan-100 rounded-2xl flex items-center justify-between">
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 rounded-full bg-white border border-indigo-200 flex items-center justify-center overflow-hidden">
+                                        <div className="w-10 h-10 rounded-full bg-white border border-cyan-200 flex items-center justify-center overflow-hidden">
                                             {project.owner?.avatar ? (
                                                 <img src={project.owner.avatar} alt={project.owner.name} className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="font-bold text-indigo-600">{project.owner?.name[0]}</span>
+                                                <span className="font-bold text-cyan-700">{project.owner?.name[0]}</span>
                                             )}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-900">{project.owner?.name} (You)</p>
-                                            <p className="text-xs text-indigo-600 font-medium uppercase tracking-wider">Current Leader</p>
+                                            <p className="font-bold text-slate-900">{project.owner?.name} (You)</p>
+                                            <p className="text-xs text-cyan-700 font-medium uppercase tracking-wider">Current Leader</p>
                                         </div>
                                     </div>
-                                    <Shield className="w-5 h-5 text-indigo-600" />
+                                    <Shield className="w-5 h-5 text-cyan-700" />
                                 </div>
 
                                 <div className="pt-4">
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 px-1">Members</h3>
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 px-1">Members</h3>
                                     <div className="space-y-2">
                                         {project.members?.length === 0 ? (
-                                            <p className="text-center py-8 text-gray-400 text-sm italic bg-gray-50 rounded-2xl border border-dashed border-gray-200">No members to transfer leadership to.</p>
+                                            <p className="text-center py-8 text-slate-400 text-sm italic bg-slate-50 rounded-2xl border border-dashed border-slate-200">No members to transfer leadership to.</p>
                                         ) : (
                                             project.members?.map((member: any) => (
-                                                <div key={member._id} className="p-3 bg-white border border-gray-100 rounded-2xl flex items-center justify-between hover:border-indigo-100 transition-colors">
+                                                <div key={member._id} className="p-3 bg-white border border-slate-100 rounded-2xl flex items-center justify-between hover:border-cyan-200 transition-colors">
                                                     <div className="flex items-center space-x-3">
-                                                        <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-100 flex items-center justify-center overflow-hidden">
+                                                        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-100 flex items-center justify-center overflow-hidden">
                                                             {member.avatar ? (
                                                                 <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
                                                             ) : (
-                                                                <span className="font-bold text-gray-600">{member.name[0]}</span>
+                                                                <span className="font-bold text-slate-600">{member.name[0]}</span>
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-gray-900">{member.name}</p>
-                                                            <p className="text-xs text-gray-500">{member.email}</p>
+                                                            <p className="font-bold text-slate-900">{member.name}</p>
+                                                            <p className="text-xs text-slate-500">{member.email}</p>
                                                         </div>
                                                     </div>
                                                     <button
                                                         onClick={() => handleTransferLeadership(member._id)}
                                                         disabled={transferring}
-                                                        className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider bg-gray-100 hover:bg-indigo-600 hover:text-white rounded-lg transition-all"
+                                                        className="px-3 py-1.5 text-[10px] font-black uppercase tracking-wider bg-slate-100 hover:bg-cyan-600 hover:text-white rounded-lg transition-all"
                                                     >
                                                         Make Leader
                                                     </button>
@@ -1264,6 +1274,7 @@ const ProjectBoard = () => {
                     </div>
                 )}
             </AnimatePresence>
+            </div>
         </div>
     );
 };

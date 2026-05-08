@@ -23,21 +23,21 @@ const Navbar = () => {
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
     const navLinks = [
-        { to: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-gray-600', hover: 'hover:text-indigo-600' },
-        { to: '/settings', label: 'Settings', icon: Settings, color: 'text-gray-600', hover: 'hover:text-indigo-600' },
-        ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel', icon: Shield, color: 'text-purple-600', hover: 'hover:text-purple-700', bg: 'bg-purple-50' }] : [])
+        { to: '/', label: 'Dashboard', icon: LayoutDashboard, color: 'text-slate-200', hover: 'hover:text-cyan-200', bg: 'bg-white/5' },
+        { to: '/settings', label: 'Settings', icon: Settings, color: 'text-slate-200', hover: 'hover:text-cyan-200', bg: 'bg-white/5' },
+        ...(user?.role === 'admin' ? [{ to: '/admin', label: 'Admin Panel', icon: Shield, color: 'text-amber-200', hover: 'hover:text-amber-100', bg: 'bg-amber-400/10' }] : [])
     ];
 
     return (
-        <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/70 text-white shadow-2xl shadow-slate-950/25 backdrop-blur-2xl">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
+                <div className="flex h-16 justify-between">
                     <div className="flex items-center space-x-8">
                         <Link to="/" className="flex items-center space-x-2 group">
-                            <div className="p-1.5 bg-indigo-600 rounded-lg group-hover:bg-indigo-700 transition-colors">
+                            <div className="rounded-lg bg-gradient-to-br from-indigo-600 to-cyan-500 p-1.5 transition-transform group-hover:scale-105">
                                 <Code2 className="w-6 h-6 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900 tracking-tight">TaskFlow</span>
+                            <span className="text-xl font-black tracking-tight text-white">TaskFlow</span>
                         </Link>
 
                         <div className="hidden md:flex items-center space-x-4">
@@ -45,7 +45,7 @@ const Navbar = () => {
                                 <Link 
                                     key={link.to}
                                     to={link.to} 
-                                    className={`flex items-center space-x-1 px-3 py-2 text-sm font-medium ${link.color} ${link.hover} transition-colors ${link.bg || ''} rounded-md`}
+                                    className={`flex items-center space-x-1 rounded-full px-3.5 py-2 text-sm font-semibold ${link.color} ${link.hover} ${link.bg || ''} transition-colors border border-white/10 hover:border-white/20`}
                                 >
                                     <link.icon className="w-4 h-4" />
                                     <span>{link.label}</span>
@@ -56,13 +56,13 @@ const Navbar = () => {
 
                     <div className="flex items-center space-x-6">
                         <div className="hidden sm:flex flex-col items-end">
-                            <span className="text-sm font-semibold text-gray-900">{user?.name}</span>
-                            <span className="text-xs text-gray-500 capitalize">{user?.role}</span>
+                            <span className="text-sm font-semibold text-white">{user?.name}</span>
+                            <span className="text-xs text-slate-400 capitalize">{user?.role}</span>
                         </div>
                         
                         <button
                             onClick={handleLogout}
-                            className="hidden sm:flex items-center space-x-1 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-100"
+                            className="hidden sm:flex items-center space-x-1 rounded-full border border-rose-400/20 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-200 transition-all hover:bg-rose-400/15 hover:text-rose-100"
                         >
                             <LogOut className="w-4 h-4" />
                             <span>Logout</span>
@@ -70,7 +70,7 @@ const Navbar = () => {
 
                         <button 
                             onClick={toggleMenu}
-                            className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="md:hidden rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/10"
                         >
                             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
@@ -85,7 +85,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden border-t border-gray-100 bg-white overflow-hidden"
+                        className="md:hidden overflow-hidden border-t border-white/10 bg-slate-950/90 backdrop-blur-2xl"
                     >
                         <div className="px-4 pt-2 pb-6 space-y-2">
                             {navLinks.map((link) => (
@@ -93,20 +93,20 @@ const Navbar = () => {
                                     key={link.to}
                                     to={link.to}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-base font-medium ${link.color} ${link.bg || 'hover:bg-gray-50'}`}
+                                    className={`flex items-center space-x-3 rounded-2xl px-4 py-3 text-base font-semibold ${link.color} ${link.bg || 'bg-white/5'} border border-white/10 hover:border-white/20`}
                                 >
                                     <link.icon className="w-5 h-5" />
                                     <span>{link.label}</span>
                                 </Link>
                             ))}
-                            <div className="pt-4 border-t border-gray-100">
-                                <div className="px-4 py-3 bg-gray-50 rounded-xl mb-3">
-                                    <div className="text-sm font-bold text-gray-900">{user?.name}</div>
-                                    <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+                            <div className="pt-4 border-t border-white/10">
+                                <div className="mb-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                                    <div className="text-sm font-bold text-white">{user?.name}</div>
+                                    <div className="text-xs capitalize text-slate-400">{user?.role}</div>
                                 </div>
                                 <button
                                     onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                                    className="w-full flex items-center mb-3 space-x-3 px-4 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                                    className="mb-3 flex w-full items-center space-x-3 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-base font-semibold text-rose-200 transition-colors hover:bg-rose-400/15"
                                 >
                                     <LogOut className="w-5 h-5" />
                                     <span>Logout</span>
