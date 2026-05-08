@@ -40,13 +40,14 @@ exports.createTask = async (req, res) => {
         }
 
         const task = await Task.create(req.body);
+        const populatedTask = await Task.findById(task._id).populate('assignees', 'name avatar');
 
         // Optional: Emit socket event for new task creation
-        global.io.to(task.project.toString()).emit('task:created', task);
+        global.io.to(task.project.toString()).emit('task:created', populatedTask);
 
         res.status(201).json({
             success: true,
-            data: task
+            data: populatedTask
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

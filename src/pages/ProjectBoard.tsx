@@ -48,6 +48,8 @@ interface Comment {
     createdAt: string;
 }
 
+type Assignee = string | { name: string; avatar?: string; _id?: string };
+
 const COLUMNS = [
     { id: 'todo', title: 'To Do', icon: CircleDashed, color: 'bg-white/10 text-slate-200' },
     { id: 'inprogress', title: 'In Progress', icon: Clock, color: 'bg-cyan-400/20 text-cyan-100' },
@@ -147,6 +149,16 @@ const ProjectBoard = () => {
             return false;
         }
         return true;
+    };
+
+    const getAssigneeName = (assignee: Assignee) => {
+        if (typeof assignee === 'string') return 'Assigned';
+        return assignee.name || 'Assigned';
+    };
+
+    const getAssigneeAvatar = (assignee: Assignee) => {
+        if (typeof assignee === 'string') return undefined;
+        return assignee.avatar;
     };
 
     const fetchProjectData = useCallback(async () => {
@@ -644,12 +656,12 @@ const ProjectBoard = () => {
                                                                                     <div 
                                                                                         key={idx} 
                                                                                         className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center overflow-hidden z-10"
-                                                                                        title={a.name}
+                                                                                        title={getAssigneeName(a as Assignee)}
                                                                                     >
-                                                                                        {a.avatar ? (
-                                                                                            <img src={a.avatar} alt={a.name} className="w-full h-full object-cover" />
+                                                                                        {getAssigneeAvatar(a as Assignee) ? (
+                                                                                            <img src={getAssigneeAvatar(a as Assignee)} alt={getAssigneeName(a as Assignee)} className="w-full h-full object-cover" />
                                                                                         ) : (
-                                                                                            <span className="text-[10px] font-bold text-gray-400">{a.name[0]}</span>
+                                                                                            <span className="text-[10px] font-bold text-gray-400">{getAssigneeName(a as Assignee)[0]}</span>
                                                                                         )}
                                                                                     </div>
                                                                                 ))
