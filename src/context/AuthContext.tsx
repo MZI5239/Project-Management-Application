@@ -1,10 +1,35 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/axios';
 
-const AuthContext = createContext(null);
+export interface AuthUser {
+    _id: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'member';
+    isActive: boolean;
+    avatar?: string;
+    preferences?: {
+        notifications?: {
+            email?: boolean;
+            inApp?: boolean;
+        };
+    };
+}
 
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+interface AuthContextValue {
+    user: AuthUser | null;
+    loading: boolean;
+    login: (email: string, password: string) => Promise<any>;
+    register: (userData: unknown) => Promise<any>;
+    logout: () => Promise<void>;
+    updateProfile: (updates: unknown) => Promise<any>;
+    changePassword: (currentPassword: string, newPassword: string) => Promise<any>;
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -12,7 +37,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 const res = await api.get('/auth/me');
                 setUser(res.data.user);
-            } catch (err) {
+            } catch {
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -21,13 +46,13 @@ export const AuthProvider = ({ children }) => {
         checkLoggedIn();
     }, []);
 
-    const login = async (email, password) => {
+    const login = async (email: string, password: string) => {
         const res = await api.post('/auth/login', { email, password });
         setUser(res.data.user);
         return res.data;
     };
 
-    const register = async (userData) => {
+    const register = async (userData: unknown) => {
         const res = await api.post('/auth/register', userData);
         setUser(res.data.user);
         return res.data;
@@ -38,13 +63,13 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    const updateProfile = async (updates) => {
+    const updateProfile = async (updates: unknown) => {
         const res = await api.put('/auth/me', updates);
         setUser(res.data.user);
         return res.data;
     };
 
-    const changePassword = async (currentPassword, newPassword) => {
+    const changePassword = async (currentPassword: string, newPassword: string) => {
         const res = await api.put('/auth/change-password', { currentPassword, newPassword });
         setUser(res.data.user);
         return res.data;

@@ -8,6 +8,12 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, ShieldCheck, Users } from 'lucide-react';
 
+interface RegisterFormValues {
+    name: string;
+    email: string;
+    password: string;
+}
+
 const schema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
@@ -20,7 +26,7 @@ const schema = z.object({
 const Register = () => {
     const { register: registerAuth } = useAuth();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterFormValues>({
         resolver: zodResolver(schema)
     });
 
@@ -30,12 +36,12 @@ const Register = () => {
         { icon: Users, label: 'Team workspace ready' }
     ];
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: RegisterFormValues) => {
         try {
             await registerAuth(data);
             toast.success('Registration successful!');
             navigate('/');
-        } catch (err) {
+        } catch (err: any) {
             toast.error(err.response?.data?.message || 'Registration failed');
         }
     };

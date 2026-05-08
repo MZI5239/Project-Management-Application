@@ -8,13 +8,17 @@ import api from '../api/axios';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Mail, Sparkles, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
+interface ForgotPasswordFormValues {
+    email: string;
+}
+
 const schema = z.object({
     email: z.string().email('Invalid email address')
 });
 
 const ForgotPassword = () => {
     const [submitted, setSubmitted] = useState(false);
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ForgotPasswordFormValues>({
         resolver: zodResolver(schema)
     });
 
@@ -24,12 +28,12 @@ const ForgotPassword = () => {
         { icon: CheckCircle2, label: 'Set a new password' }
     ];
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: ForgotPasswordFormValues) => {
         try {
             await api.post('/auth/forgot-password', { email: data.email });
             setSubmitted(true);
             toast.success('Reset email sent');
-        } catch (err) {
+        } catch (err: any) {
             toast.error(err.response?.data?.message || 'Failed to send reset email');
         }
     };

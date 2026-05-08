@@ -25,6 +25,7 @@ import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { AuthUser } from '../context/AuthContext';
 
 interface Task {
     _id: string;
@@ -48,15 +49,30 @@ interface Comment {
 }
 
 const COLUMNS = [
-    { id: 'todo', title: 'To Do', icon: <CircleDashed className="w-4 h-4" />, color: 'bg-white/10 text-slate-200' },
-    { id: 'inprogress', title: 'In Progress', icon: <Clock className="w-4 h-4" />, color: 'bg-cyan-400/20 text-cyan-100' },
-    { id: 'done', title: 'Done', icon: <CheckCircle2 className="w-4 h-4" />, color: 'bg-emerald-400/20 text-emerald-100' }
+    { id: 'todo', title: 'To Do', icon: CircleDashed, color: 'bg-white/10 text-slate-200' },
+    { id: 'inprogress', title: 'In Progress', icon: Clock, color: 'bg-cyan-400/20 text-cyan-100' },
+    { id: 'done', title: 'Done', icon: CheckCircle2, color: 'bg-emerald-400/20 text-emerald-100' }
 ];
+
+interface ProjectParticipant {
+    _id: string;
+    name: string;
+    email?: string;
+    avatar?: string;
+}
+
+interface ProjectData {
+    _id: string;
+    title: string;
+    description?: string;
+    owner?: ProjectParticipant;
+    members?: ProjectParticipant[];
+}
 
 const ProjectBoard = () => {
     const { id } = useParams<{ id: string }>();
-    const { user: currentUser } = useAuth();
-    const [project, setProject] = useState<any>(null);
+    const { user: currentUser } = useAuth() as { user: AuthUser | null };
+    const [project, setProject] = useState<ProjectData | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddTask, setShowAddTask] = useState<string | null>(null);
@@ -91,9 +107,9 @@ const ProjectBoard = () => {
     const [showLeadershipModal, setShowLeadershipModal] = useState(false);
     const [transferring, setTransferring] = useState(false);
 
-    const isLeader = project && currentUser && project.owner?._id === currentUser._id;
+    const isLeader = !!project && !!currentUser && project.owner?._id === currentUser._id;
     
-    const participants = project ? [project.owner, ...(project.members || [])] : [];
+    const participants = project ? [project.owner, ...(project.members || [])].filter(Boolean) as ProjectParticipant[] : [];
 
     const getLabelColor = (label: string) => {
         const colors = [
@@ -114,7 +130,7 @@ const ProjectBoard = () => {
         return colors[Math.abs(hash) % colors.length];
     };
 
-    const checkDependencies = (task: Task, newStatus: string) => {
+    const checkDependencies = (task: Pick<Task, 'dependencies'>, newStatus: string) => {
         if (newStatus === 'todo') return true;
         if (!task.dependencies || task.dependencies.length === 0) return true;
 
@@ -511,7 +527,7 @@ const ProjectBoard = () => {
                                     <div className="flex items-center justify-between mb-4 px-2">
                                         <div className="flex items-center space-x-2">
                                             <div className={`p-1.5 rounded-md ${column.color}`}>
-                                                {React.cloneElement(column.icon as React.ReactElement, { className: 'w-4 h-4' })}
+                                                <column.icon className="w-4 h-4" />
                                             </div>
                                             <h2 className="font-bold text-white">{column.title}</h2>
                                             <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs font-bold text-slate-300 border border-white/15">

@@ -7,8 +7,16 @@ import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+interface DashboardProject {
+    _id: string;
+    title: string;
+    description?: string;
+    status: 'active' | 'archived' | 'completed' | string;
+    owner?: { name?: string };
+}
+
 const Dashboard = () => {
-    const [projects, setProjects] = useState([]);
+    const [projects, setProjects] = useState<DashboardProject[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newProject, setNewProject] = useState({ title: '', description: '' });
@@ -29,7 +37,7 @@ const Dashboard = () => {
         fetchProjects();
     }, []);
 
-    const handleCreateProject = async (e) => {
+    const handleCreateProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitting(true);
         try {
@@ -38,7 +46,7 @@ const Dashboard = () => {
             toast.success('Project created successfully');
             setIsModalOpen(false);
             setNewProject({ title: '', description: '' });
-        } catch (error) {
+        } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to create project');
         } finally {
             setSubmitting(false);
@@ -239,7 +247,7 @@ const Dashboard = () => {
                                 <div>
                                     <label className="mb-1.5 block text-sm font-semibold text-slate-700">Description (Optional)</label>
                                     <textarea
-                                        rows="3"
+                                        rows={3}
                                         value={newProject.description}
                                         onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                                         className="w-full resize-none rounded-2xl border border-slate-200 px-4 py-3 outline-none transition-all focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/15"

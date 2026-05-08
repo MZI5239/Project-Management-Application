@@ -8,6 +8,11 @@ import { useAuth } from '../context/AuthContext';
 import { motion } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, Zap, Lock, Users } from 'lucide-react';
 
+interface LoginFormValues {
+    email: string;
+    password: string;
+}
+
 const schema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(1, 'Password is required')
@@ -16,7 +21,7 @@ const schema = z.object({
 const Login = () => {
     const { login } = useAuth();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({
         resolver: zodResolver(schema)
     });
 
@@ -26,12 +31,12 @@ const Login = () => {
         { icon: Users, label: 'Team collaboration' }
     ];
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: LoginFormValues) => {
         try {
             await login(data.email, data.password);
             toast.success('Login successful!');
             navigate('/');
-        } catch (err) {
+        } catch (err: any) {
             toast.error(err.response?.data?.message || 'Login failed');
         }
     };
