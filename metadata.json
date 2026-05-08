@@ -1,0 +1,6 @@
+{
+  "name": "TaskFlow",
+  "description": "A collaborative task management application with projects, members, and status tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
