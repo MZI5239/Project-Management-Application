@@ -161,6 +161,20 @@ const ProjectBoard = () => {
         return assignee.avatar;
     };
 
+    const upsertTaskById = (nextTask: Task) => {
+        setTasks(prev => {
+            const existingIndex = prev.findIndex(task => task._id === nextTask._id);
+
+            if (existingIndex === -1) {
+                return [...prev, nextTask];
+            }
+
+            const nextTasks = [...prev];
+            nextTasks[existingIndex] = { ...nextTasks[existingIndex], ...nextTask };
+            return nextTasks;
+        });
+    };
+
     const fetchProjectData = useCallback(async () => {
         if (!id) return;
         try {
@@ -280,9 +294,7 @@ const ProjectBoard = () => {
                 dependencies: newTaskDependencies,
                 labels: newTaskLabels
             });
-            // Task will be added via socket event 'task:created' if implemented correctly
-            // But we add it locally too for better UX
-            setTasks(prev => [...prev, res.data.data]);
+            upsertTaskById(res.data.data);
             setNewTaskTitle('');
             setNewTaskDueDate('');
             setNewTaskPriority('low');
