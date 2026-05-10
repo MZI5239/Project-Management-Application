@@ -397,7 +397,7 @@ const ProjectBoard = () => {
             setProject(res.data.data);
             setInviteEmail('');
             setShowInviteModal(false);
-            toast.success('Member added successfully');
+            toast.success(res.data.message || 'Member added successfully');
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to add member');
         } finally {
