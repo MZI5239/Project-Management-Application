@@ -67,6 +67,7 @@ interface ProjectData {
     _id: string;
     title: string;
     description?: string;
+    status: 'active' | 'archived';
     owner?: ProjectParticipant;
     members?: ProjectParticipant[];
 }
@@ -108,6 +109,8 @@ const ProjectBoard = () => {
 
     const [showLeadershipModal, setShowLeadershipModal] = useState(false);
     const [transferring, setTransferring] = useState(false);
+
+    const [showProjectMenu, setShowProjectMenu] = useState(false);
 
     const isLeader = !!project && !!currentUser && project.owner?._id === currentUser._id;
     
@@ -228,6 +231,7 @@ const ProjectBoard = () => {
 
         if (!destination) return;
         if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+        if (project?.status !== 'active') return;
         
         const task = tasks.find(t => t._id === draggableId);
         if (!task) return;
@@ -261,7 +265,7 @@ const ProjectBoard = () => {
         e.stopPropagation();
         
         const isAssignee = task.assignees?.some(a => (a._id || a) === currentUser?._id);
-        if (!isLeader && !isAssignee) {
+        if ((!isLeader && !isAssignee) || project?.status !== 'active') {
             toast.error('Only the leader or an assignee can complete this task');
             return;
         }
@@ -280,8 +284,21 @@ const ProjectBoard = () => {
         }
     };
 
+    const handleToggleProjectStatus = async () => {
+        if (!isLeader || !project) return;
+
+        try {
+            const res = await api.patch(`/projects/${project._id}/toggle-status`);
+            setProject(res.data.data);
+            setShowProjectMenu(false);
+            toast.success(`Project ${res.data.data.status === 'active' ? 'activated' : 'deactivated'} successfully`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to update project status');
+        }
+    };
+
     const handleAddTask = async (status: string) => {
-        if (!isLeader) return;
+        if (!isLeader || project?.status !== 'active') return;
         if (!newTaskTitle.trim()) return;
         try {
             const res = await api.post('/tasks', {
@@ -311,7 +328,7 @@ const ProjectBoard = () => {
 
     const handleEditTask = (task: Task) => {
         const isAssignee = task.assignees?.some(a => (a._id || a) === currentUser?._id);
-        if (!isLeader && !isAssignee) return;
+        if ((!isLeader && !isAssignee) || project?.status !== 'active') return;
         setEditingTask(task);
         fetchComments(task._id);
         setEditForm({
@@ -327,7 +344,7 @@ const ProjectBoard = () => {
 
     const handleUpdateTask = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editingTask) return;
+        if (!editingTask || project?.status !== 'active') return;
         
         const isAssignee = editingTask.assignees?.some(a => (a._id || a) === currentUser?._id);
         if (!isLeader && !isAssignee) return;
@@ -357,7 +374,7 @@ const ProjectBoard = () => {
     const handleDeleteTask = async (taskId: string, e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
         
-        if (!isLeader) return;
+        if (!isLeader || project?.status !== 'active') return;
         if (!window.confirm('Are you sure you want to delete this task?')) return;
 
         try {
@@ -372,7 +389,7 @@ const ProjectBoard = () => {
 
     const handleInviteMember = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isLeader || !inviteEmail.trim()) return;
+        if (!isLeader || project?.status !== 'active' || !inviteEmail.trim()) return;
         
         setInviting(true);
         try {
@@ -402,6 +419,7 @@ const ProjectBoard = () => {
     };
 
     const handleAddComment = async (taskId: string) => {
+        if (project?.status !== 'active') return;
         const text = commentInputs[taskId];
         if (!text?.trim()) return;
 
@@ -416,7 +434,7 @@ const ProjectBoard = () => {
     };
 
     const handleTransferLeadership = async (newOwnerId: string) => {
-        if (!isLeader) return;
+        if (!isLeader || project?.status !== 'active') return;
         if (!window.confirm('Are you sure you want to transfer leadership? You will become a member.')) return;
 
         setTransferring(true);
@@ -511,7 +529,7 @@ const ProjectBoard = () => {
                                 ))}
                             </div>
                             <div className="h-6 w-px bg-white/20 mx-1" />
-                            {isLeader && (
+                            {isLeader && project?.status === 'active' && (
                                 <button 
                                     onClick={() => setShowInviteModal(true)}
                                     className="p-2 text-slate-300 hover:text-cyan-200 hover:bg-cyan-400/10 rounded-full transition-colors"
@@ -520,7 +538,7 @@ const ProjectBoard = () => {
                                     <Plus className="w-5 h-5" />
                                 </button>
                             )}
-                            {isLeader && (
+                            {isLeader && project?.status === 'active' && (
                                 <button 
                                     onClick={() => setShowLeadershipModal(true)}
                                     className="p-2 text-slate-300 hover:text-amber-200 hover:bg-amber-400/10 rounded-full transition-colors"
@@ -529,13 +547,36 @@ const ProjectBoard = () => {
                                     <Shield className="w-5 h-5" />
                                 </button>
                             )}
-                            <button className="p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                            <button 
+                                onClick={() => setShowProjectMenu(!showProjectMenu)}
+                                className="relative p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+                            >
                                 <MoreVertical className="w-5 h-5" />
+                                {showProjectMenu && (
+                                    <div className="absolute right-0 top-12 z-20 min-w-[180px] rounded-3xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
+                                        <button
+                                            onClick={handleToggleProjectStatus}
+                                            className="w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-900/80"
+                                        >
+                                            {project?.status === 'active' ? 'Deactivate project' : 'Activate project'}
+                                        </button>
+                                    </div>
+                                )}
                             </button>
                         </div>
                     </motion.div>
                 </div>
             </header>
+
+            {project?.status === 'archived' && (
+                <div className="mx-4 md:mx-8 mb-4">
+                    <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-center">
+                        <p className="text-amber-200 font-semibold">
+                            This project is currently deactivated. Only the project leader can reactivate it.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <main className="flex-1 overflow-x-auto p-4 md:p-8">
                 <motion.div 
@@ -558,7 +599,7 @@ const ProjectBoard = () => {
                                                 {tasks.filter(t => t.status === column.id).length}
                                             </span>
                                         </div>
-                                        {isLeader && (
+                                        {isLeader && project?.status === 'active' && (
                                             <button 
                                                 onClick={() => setShowAddTask(column.id)}
                                                 className="p-1 hover:bg-white/10 rounded transition-colors"
@@ -582,7 +623,7 @@ const ProjectBoard = () => {
                                                             key: task._id,
                                                             draggableId: task._id,
                                                             index: index,
-                                                            isDragDisabled: !isLeader && !task.assignees?.some(a => (a._id || a) === currentUser?._id)
+                                                            isDragDisabled: project?.status !== 'active' || (!isLeader && !task.assignees?.some(a => (a._id || a) === currentUser?._id))
                                                         };
                                                         
                                                         const activeSourceId = hoveredTaskId || editingTask?._id;
@@ -620,7 +661,7 @@ const ProjectBoard = () => {
                                                                             {task.priority || 'low'}
                                                                         </span>
                                                                         <div className="flex items-center space-x-1">
-                                                                            {isLeader && (
+                                                                            {isLeader && project?.status === 'active' && (
                                                                                 <button 
                                                                                     onClick={(e) => handleDeleteTask(task._id, e)}
                                                                                     className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded transition-all opacity-0 group-hover:opacity-100"
@@ -629,7 +670,7 @@ const ProjectBoard = () => {
                                                                                     <Trash2 className="w-3.5 h-3.5" />
                                                                                 </button>
                                                                             )}
-                                                                            {isLeader && <MoreVertical className="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                                                                            {isLeader && project?.status === 'active' && <MoreVertical className="w-4 h-4 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />}
                                                                         </div>
                                                                     </div>
                                                                     
@@ -758,10 +799,11 @@ const ProjectBoard = () => {
                                                                                     
                                                                                     <div className="flex items-center space-x-1">
                                                                                         <input
+                                                                                            disabled={project?.status !== 'active'}
                                                                                             value={commentInputs[task._id] || ''}
                                                                                             onChange={(e) => setCommentInputs(prev => ({ ...prev, [task._id]: e.target.value }))}
                                                                                             placeholder="Comment..."
-                                                                                            className="flex-1 text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-cyan-300"
+                                                                                            className="flex-1 text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                                                             onKeyDown={(e) => {
                                                                                                 if (e.key === 'Enter') {
                                                                                                     e.preventDefault();
@@ -770,8 +812,9 @@ const ProjectBoard = () => {
                                                                                             }}
                                                                                         />
                                                                                         <button 
+                                                                                            disabled={project?.status !== 'active'}
                                                                                             onClick={() => handleAddComment(task._id)}
-                                                                                            className="p-1 bg-cyan-50 text-cyan-700 rounded-lg hover:bg-cyan-600 hover:text-white transition-colors"
+                                                                                            className="p-1 bg-cyan-50 text-cyan-700 rounded-lg hover:bg-cyan-600 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                                                         >
                                                                                             <Send className="w-3 h-3" />
                                                                                         </button>
@@ -791,35 +834,39 @@ const ProjectBoard = () => {
                                                     <div className="bg-white/95 p-3 rounded-xl border-2 border-cyan-300/40 shadow-lg animate-in fade-in zoom-in duration-200">
                                                         <input
                                                             autoFocus
+                                                            disabled={project?.status !== 'active'}
                                                             type="text"
                                                             value={newTaskTitle}
                                                             onChange={(e) => setNewTaskTitle(e.target.value)}
-                                                            className="w-full text-sm outline-none mb-3 font-medium text-slate-800"
+                                                            className="w-full text-sm outline-none mb-3 font-medium text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             placeholder="What needs to be done?"
                                                             onKeyDown={(e) => e.key === 'Enter' && handleAddTask(column.id)}
                                                         />
                                                         <div className="flex items-center space-x-2 mb-3">
                                                             <Calendar className="w-3.5 h-3.5 text-slate-400" />
                                                             <input 
+                                                                disabled={project?.status !== 'active'}
                                                                 type="date"
                                                                 value={newTaskDueDate}
                                                                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             />
                                                             <select
+                                                                disabled={project?.status !== 'active'}
                                                                 value={newTaskPriority}
                                                                 onChange={(e) => setNewTaskPriority(e.target.value as any)}
-                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none w-20"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none w-20 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 <option value="low">Low</option>
                                                                 <option value="medium">Med</option>
                                                                 <option value="high">High</option>
                                                             </select>
                                                             <select
+                                                                disabled={project?.status !== 'active'}
                                                                 multiple
                                                                 value={newTaskAssignees}
                                                                 onChange={(e) => setNewTaskAssignees(Array.from(e.target.selectedOptions).map((o: any) => o.value))}
-                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1 h-16"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none flex-1 h-16 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 {participants.map((member: any) => (
                                                                     <option key={member._id} value={member._id}>{member.name}</option>
@@ -829,10 +876,11 @@ const ProjectBoard = () => {
                                                         <div className="flex flex-col space-y-1 mb-3">
                                                             <label className="text-[10px] font-bold text-slate-400 uppercase">Prerequisites</label>
                                                             <select
+                                                                disabled={project?.status !== 'active'}
                                                                 multiple
                                                                 value={newTaskDependencies}
                                                                 onChange={(e) => setNewTaskDependencies(Array.from(e.target.selectedOptions).map((o: any) => o.value))}
-                                                                className="w-full text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none h-16"
+                                                                className="w-full text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none h-16 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 {tasks.map(t => (
                                                                     <option key={t._id} value={t._id}>{t.title}</option>
@@ -846,14 +894,15 @@ const ProjectBoard = () => {
                                                                 {newTaskLabels.map((label, i) => (
                                                                     <span 
                                                                         key={i} 
-                                                                        onClick={() => setNewTaskLabels(prev => prev.filter((_, idx) => idx !== i))}
-                                                                        className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border cursor-pointer hover:opacity-70 ${getLabelColor(label)}`}
+                                                                        onClick={() => project?.status === 'active' && setNewTaskLabels(prev => prev.filter((_, idx) => idx !== i))}
+                                                                        className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full border ${project?.status === 'active' ? 'cursor-pointer hover:opacity-70' : 'cursor-not-allowed opacity-50' } ${getLabelColor(label)}`}
                                                                     >
-                                                                        {label} ×
+                                                                        {label} {project?.status === 'active' && '×'}
                                                                     </span>
                                                                 ))}
                                                             </div>
                                                             <input 
+                                                                disabled={project?.status !== 'active'}
                                                                 type="text"
                                                                 value={labelInput}
                                                                 onChange={(e) => setLabelInput(e.target.value)}
@@ -867,7 +916,7 @@ const ProjectBoard = () => {
                                                                     }
                                                                 }}
                                                                 placeholder="Add label & press Enter"
-                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none"
+                                                                className="text-[10px] text-slate-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                                                             />
                                                         </div>
                                                         <div className="flex justify-end space-x-2">
@@ -887,8 +936,9 @@ const ProjectBoard = () => {
                                                                 Cancel
                                                             </button>
                                                             <button 
+                                                                disabled={project?.status !== 'active'}
                                                                 onClick={() => handleAddTask(column.id)}
-                                                                className="px-2 py-1 text-xs bg-cyan-600 text-white rounded font-bold hover:bg-cyan-700"
+                                                                className="px-2 py-1 text-xs bg-cyan-600 text-white rounded font-bold hover:bg-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 Add Task
                                                             </button>
@@ -1070,8 +1120,9 @@ const ProjectBoard = () => {
                                     {(isLeader || editingTask.assignees?.some(a => (a._id || a) === currentUser?._id)) && editingTask.status !== 'done' && (
                                         <button
                                             type="button"
+                                            disabled={project?.status !== 'active'}
                                             onClick={(e: any) => handleMarkComplete(editingTask, e)}
-                                            className="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center space-x-2"
+                                            className="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <CheckCircle2 className="w-5 h-5" />
                                             <span>Mark Done</span>
@@ -1080,7 +1131,8 @@ const ProjectBoard = () => {
                                     {isLeader ? (
                                         <button
                                             type="submit"
-                                            className="flex-[2] bg-gradient-to-r from-indigo-600 via-cyan-600 to-sky-500 text-white rounded-2xl py-4 font-bold shadow-xl shadow-cyan-200/40 transition-all active:scale-[0.98]"
+                                            disabled={project?.status !== 'active'}
+                                            className="flex-[2] bg-gradient-to-r from-indigo-600 via-cyan-600 to-sky-500 text-white rounded-2xl py-4 font-bold shadow-xl shadow-cyan-200/40 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             Save Changes
                                         </button>
@@ -1142,6 +1194,7 @@ const ProjectBoard = () => {
                                         
                                         <div className="flex space-x-2">
                                             <input 
+                                                disabled={project?.status !== 'active'}
                                                 value={commentInputs[editingTask._id] || ''}
                                                 onChange={(e) => setCommentInputs(prev => ({ ...prev, [editingTask._id]: e.target.value }))}
                                                 onKeyDown={(e) => {
@@ -1151,12 +1204,13 @@ const ProjectBoard = () => {
                                                     }
                                                 }}
                                                 placeholder="Write a comment..."
-                                                className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium"
+                                                className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                             />
                                             <button 
                                                 type="button"
+                                                disabled={project?.status !== 'active'}
                                                 onClick={() => handleAddComment(editingTask._id)}
-                                                className="p-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center shadow-lg shadow-cyan-100"
+                                                className="p-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-all flex items-center justify-center shadow-lg shadow-cyan-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <Send className="w-4 h-4" />
                                             </button>

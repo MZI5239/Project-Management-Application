@@ -1,26 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Layout, ArrowRight, User as UserIcon, X, Loader2 } from 'lucide-react';
+import { Plus, Layout, ArrowRight, User as UserIcon, X, Loader2, MoreVertical } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useAuth } from '../context/AuthContext';
 
 interface DashboardProject {
     _id: string;
     title: string;
     description?: string;
     status: 'active' | 'archived' | 'completed' | string;
-    owner?: { name?: string };
+    owner?: { _id?: string; name?: string };
 }
 
 const Dashboard = () => {
+    const { user } = useAuth();
     const [projects, setProjects] = useState<DashboardProject[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newProject, setNewProject] = useState({ title: '', description: '' });
     const [submitting, setSubmitting] = useState(false);
+    const [openProjectMenu, setOpenProjectMenu] = useState<string | null>(null);
 
     const fetchProjects = async () => {
         try {
@@ -50,6 +53,21 @@ const Dashboard = () => {
             toast.error(error.response?.data?.message || 'Failed to create project');
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleToggleProjectStatus = async (projectId: string, currentStatus: string) => {
+        const newStatus = currentStatus === 'active' ? 'archived' : 'active';
+        try {
+            const res = await api.put(`/projects/${projectId}`, { status: newStatus });
+            setProjects((prev) => prev.map((project) =>
+                project._id === projectId ? { ...project, status: res.data.data.status } : project
+            ));
+            toast.success(`Project ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to update project status');
+        } finally {
+            setOpenProjectMenu(null);
         }
     };
 
@@ -157,12 +175,33 @@ const Dashboard = () => {
                                             </div>
 
                                             <div className="relative z-10">
-                                                <div className="mb-4 flex items-start justify-between">
+                                                <div className="mb-4 flex items-start justify-between gap-3">
                                                     <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider ${
                                                         project.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
                                                     }`}>
                                                         {project.status}
                                                     </span>
+                                                    {user?._id && project.owner?._id === user._id && (
+                                                        <div className="relative">
+                                                            <button
+                                                                onClick={() => setOpenProjectMenu(openProjectMenu === project._id ? null : project._id)}
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/10 bg-slate-100/10 text-slate-300 transition-colors hover:bg-slate-100/15"
+                                                                aria-label="Project actions"
+                                                            >
+                                                                <MoreVertical className="h-4 w-4" />
+                                                            </button>
+                                                            {openProjectMenu === project._id && (
+                                                                <div className="absolute right-0 top-12 z-20 min-w-[180px] rounded-3xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
+                                                                    <button
+                                                                        onClick={() => handleToggleProjectStatus(project._id, project.status)}
+                                                                        className="w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-900/80"
+                                                                    >
+                                                                        {project.status === 'active' ? 'Deactivate project' : 'Activate project'}
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <h3 className="mb-2 truncate text-xl font-bold text-slate-950 transition-colors group-hover:text-cyan-700">

@@ -257,3 +257,40 @@ exports.transferLeadership = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// @desc    Toggle project status (active/inactive)
+// @route   PATCH /api/projects/:id/toggle-status
+exports.toggleProjectStatus = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+
+        if (!project) {
+            return res.status(404).json({ success: false, message: 'Project not found' });
+        }
+
+        // Make sure user is project owner (leader)
+        if (project.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: 'Only the leader can toggle project status' });
+        }
+
+        // Toggle status
+        project.status = project.status === 'active' ? 'archived' : 'active';
+        await project.save();
+
+        const updatedProject = await Project.findById(project._id)
+            .populate('members', 'name email avatar')
+            .populate('owner', 'name email');
+
+        // Emit updated project
+        if (global.io) {
+            global.io.to(project._id.toString()).emit('project:updated', updatedProject);
+        }
+
+        res.status(200).json({
+            success: true,
+            data: updatedProject
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
