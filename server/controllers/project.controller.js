@@ -138,14 +138,17 @@ exports.inviteMember = async (req, res) => {
         let recipientName = '';
 
         // If email is provided instead of userId, find the user
+        let createInvitationOnly = false;
         if (recipientEmail) {
             const User = require('../models/User');
             const user = await User.findOne({ email: recipientEmail });
             if (!user) {
-                return res.status(404).json({ success: false, message: 'User with this email not found' });
+                createInvitationOnly = true;
+                recipientName = recipientEmail;
+            } else {
+                userId = user._id;
+                recipientName = user.name;
             }
-            userId = user._id;
-            recipientName = user.name;
         } else if (userId) {
             const User = require('../models/User');
             const user = await User.findById(userId);
@@ -156,23 +159,40 @@ exports.inviteMember = async (req, res) => {
             recipientName = user.name;
         }
 
-        if (!userId) {
+        if (!recipientEmail) {
             return res.status(400).json({ success: false, message: 'User ID or Email is required' });
         }
 
-        const project = await Project.findByIdAndUpdate(
-            req.params.id,
-            { $addToSet: { members: userId } },
-            { new: true }
-        ).populate('members', 'name email avatar')
-        .populate('owner', 'name email');
+        let project = projectCheck;
+        if (!createInvitationOnly) {
+            project = await Project.findByIdAndUpdate(
+                req.params.id,
+                { $addToSet: { members: userId } },
+                { new: true }
+            ).populate('members', 'name email avatar')
+            .populate('owner', 'name email');
+        } else {
+            project = await Project.findById(req.params.id)
+                .populate('members', 'name email avatar')
+                .populate('owner', 'name email');
+        }
 
         // Send email notification
         try {
+            const subject = createInvitationOnly
+                ? `You're invited to join project: ${project.title}`
+                : `You've been added to project: ${project.title}`;
+
+            const text = createInvitationOnly
+                ? `Hello,\n\nYou have been invited to join the project "${project.title}" by ${req.user.name}.` +
+                  `\n\nIf you already have an account, sign in and join the project here: ${process.env.CLIENT_URL}/projects/${project._id}` +
+                  `\n\nIf you're new, sign up with this email to access the project.`
+                : `Hello ${recipientName},\n\nYou have been added as a member to the project "${project.title}" by ${req.user.name}.\n\nView it here: ${process.env.CLIENT_URL}/projects/${project._id}`;
+
             await sendEmail({
                 to: recipientEmail,
-                subject: `You've been added to project: ${project.title}`,
-                text: `Hello ${recipientName},\n\nYou have been added as a member to the project "${project.title}" by ${req.user.name}.\n\nView it here: ${process.env.CLIENT_URL}/projects/${project._id}`
+                subject,
+                text
             });
         } catch (error) {
             console.error('Email send failed:', error);
@@ -186,7 +206,10 @@ exports.inviteMember = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: project
+            data: project,
+            message: createInvitationOnly
+                ? `Invitation email sent to ${recipientEmail}`
+                : 'Member added successfully'
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
