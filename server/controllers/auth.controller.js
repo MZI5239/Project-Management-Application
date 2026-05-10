@@ -107,8 +107,13 @@ exports.forgotPassword = async (req, res, next) => {
         user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
         await user.save({ validateBeforeSave: false });
 
-        const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-        const message = `You requested a password reset. Please go to: \n\n ${resetUrl}`;
+        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+        if (!process.env.CLIENT_URL) {
+            console.warn('CLIENT_URL is not set. Using http://localhost:5173 as the password reset link base.');
+        }
+
+        const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
+        const message = `You requested a password reset. Please visit the URL below to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email.`;
 
         try {
             await sendEmail({
