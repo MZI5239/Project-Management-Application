@@ -39,6 +39,11 @@ exports.createTask = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Only the leader can create tasks' });
         }
 
+        // Check if project is active
+        if (project.status !== 'active') {
+            return res.status(403).json({ success: false, message: 'Cannot create tasks in archived projects' });
+        }
+
         const task = await Task.create(req.body);
         const populatedTask = await Task.findById(task._id).populate('assignees', 'name avatar');
 
@@ -65,6 +70,11 @@ exports.updateTask = async (req, res) => {
 
         const Project = require('../models/Project');
         const project = await Project.findById(task.project);
+
+        // Check if project is active
+        if (project.status !== 'active') {
+            return res.status(403).json({ success: false, message: 'Cannot update tasks in archived projects' });
+        }
 
         // Allow leader (owner) OR assignee to update tasks
         const isOwner = project.owner.toString() === req.user._id.toString();
@@ -113,6 +123,11 @@ exports.deleteTask = async (req, res) => {
 
         const Project = require('../models/Project');
         const project = await Project.findById(task.project);
+
+        // Check if project is active
+        if (project.status !== 'active') {
+            return res.status(403).json({ success: false, message: 'Cannot delete tasks in archived projects' });
+        }
 
         // Only leader (owner) can delete tasks
         if (project.owner.toString() !== req.user._id.toString()) {

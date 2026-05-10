@@ -38,6 +38,13 @@ exports.addComment = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Task not found' });
         }
 
+        // Check if project is active
+        const Project = require('../models/Project');
+        const project = await Project.findById(task.project);
+        if (project.status !== 'active') {
+            return res.status(403).json({ success: false, message: 'Cannot add comments to tasks in archived projects' });
+        }
+
         const comment = await Comment.create({
             text,
             task: taskId,

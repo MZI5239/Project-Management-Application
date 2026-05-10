@@ -14,6 +14,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const ProjectBoard = lazy(() => import('./pages/ProjectBoard'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const About = lazy(() => import('./pages/About'));
 
 // Fallback loader
 const PageLoader = () => (
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/about" element={<About />} />
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>

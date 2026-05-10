@@ -7,7 +7,8 @@ const {
     updateProject, 
     deleteProject, 
     inviteMember,
-    transferLeadership
+    transferLeadership,
+    toggleProjectStatus
 } = require('../controllers/project.controller');
 const { protect } = require('../middleware/auth');
 
@@ -25,5 +26,6 @@ router.route('/:id')
 
 router.post('/:id/invite', inviteMember);
 router.post('/:id/transfer-leadership', transferLeadership);
+router.patch('/:id/toggle-status', toggleProjectStatus);
 
 module.exports = router;
