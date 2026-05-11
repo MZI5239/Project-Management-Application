@@ -2,9 +2,8 @@
   "name": "react-example",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "tsx server/server.js",
+    "dev": "node server/dev.js",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
