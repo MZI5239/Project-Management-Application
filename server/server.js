@@ -22,8 +22,31 @@ app.use(cookieParser());
 
 // Security middlewares
 app.use(helmet({ contentSecurityPolicy: false }));
+
+// ✅ Updated CORS — allows all Vercel preview URLs
 app.use(cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: function(origin, callback) {
+        // Allow server-to-server requests (no origin)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            process.env.CLIENT_URL,
+            /https:\/\/project-management-application.*\.vercel\.app$/
+        ];
+
+        const isAllowed = allowedOrigins.some(allowed => {
+            if (!allowed) return false;
+            if (allowed instanceof RegExp) return allowed.test(origin);
+            return allowed === origin;
+        });
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            console.warn(`CORS blocked for origin: ${origin}`);
+            callback(new Error(`CORS blocked: ${origin}`));
+        }
+    },
     credentials: true
 }));
 
@@ -38,5 +61,4 @@ app.use('/api/comments', require('./routes/comment.routes'));
 const errorHandler = require('./middleware/error');
 app.use(errorHandler);
 
-// ✅ Export app for Vercel serverless
 module.exports = app;
